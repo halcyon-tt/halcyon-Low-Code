@@ -1,0 +1,83 @@
+.menu{
+  position: relative;
+  // top: -41px;
+  // left: 41px;
+  // width: 300px;
+  // height: 100%;
+  background: #fff;
+  border: 1px solid hsla(0, 0%, 92.9%, .6);
+  box-shadow: 4px 6px 6px 0 rgba(31, 50, 88, .08);
+  transition: left .2s;
+  transition: box-shadow .2s;
+  transition: display 20s;
+}
+
+.left{
+    margin-right: 2px;
+    width: 40px;
+    height: 100%;
+    background: #fff;
+    -o-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    z-index: 102;
+    flex-shrink: 0;
+    transition: width .4s;
+}
+.menuBtn{
+  cursor: pointer;
+    margin: 17px 0 0 8px;
+    height: 24px;
+    width: 24px;
+    background: 50% no-repeat;
+    background-image: url(../../images/left_spring.png);
+    background-size: 75px 51px;
+    background-position: -24px 0px;
+}
+.menuTitle{
+  height: 48px;
+  width: 100%;
+}
+.menuTitle .Tleft{
+  float: left;
+  margin-left: 15px;
+  margin-top: 16px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 16px;
+  text-align: left;
+  vertical-align: middle;
+}
+.menuTitle .Tright{
+  float: right;
+}
+.Tright .closeBtn{
+  cursor: pointer;
+  background-position: 0 -19px;
+}
+.Tright .topBtn{
+  cursor: pointer;
+  background-position: -18px -19px;
+}
+.Tright span{
+  float: right;
+  margin-top: 9px;
+  margin-right: 9px;
+  height: 20px;
+  width: 20px;
+  background: 50% no-repeat;
+  background-image: url(../../images/left_spring.png);
+  background-size: 60px 41px;
+}
+.baseEleBox{
+    display: flex;
+    flex-wrap: wrap;
+}
+.custom-drawer{
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+}

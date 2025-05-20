@@ -1,0 +1,86 @@
+.top{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      background: #eee;
+      height: 39px;
+      opacity: 1;
+      background: #fff;
+      margin-bottom: 5px;
+      border-bottom: 1px solid #eee;
+      position: sticky;
+      z-index: 101;
+      top: 0;
+}
+.top-left-logo{
+  width: 130.8px;
+  height: 36px;
+  opacity: 0;
+}
+.top-center{
+  display: flex;
+  width: 67px;
+  height: 30px;
+  justify-content: space-between;
+  align-items: center;
+}
+.top-center-phone{
+  width: 35px;
+  height: 35px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.top-center-pc{
+  width: 35px;
+  height: 35px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.top-center-phone img{
+  width: 20px;
+  height: 25px;
+}
+.top-center-pc img{
+  width: 20px;
+  height: 25px;
+}
+.active{
+  background: #f2f2f2;
+}
+.top-right{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;  
+}
+.top-right-operator{
+  display: flex;
+  width: 60px;
+  height: 40px;
+  align-items: center;
+  justify-content: space-around;
+}
+.top-right-operator img{
+  width: 20px;
+  height: 20px;
+}
+.show{
+  opacity: .5;
+}
+.restore{
+  transform: rotateY(180deg);
+}
+.top-right-function{
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-left: 15px;
+  margin-right: 3px;
+}
+
+
+
