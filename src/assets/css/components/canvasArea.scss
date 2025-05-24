@@ -5,7 +5,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  overflow-y: scroll;
+  // overflow-y: scroll;
 }
 .center{
   margin: 5px 10px 0 10px;
@@ -13,7 +13,7 @@
   height: 100%;
   box-sizing: border-box;
   box-shadow: 0 0 20px #ccc;
-  overflow-y: scroll;
+  // overflow-y: scroll;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -31,6 +31,11 @@
   opacity: .8;
   z-index: 2;
   height: calc(100% - 45px);
+}
+.phoneSize{
+  width: 375px;
+  height: 667px;
+  margin: 10px auto;
 }
 .btn{
   cursor: pointer;
@@ -54,7 +59,6 @@
   outline: none;
   cursor: default;
   caret-color: transparent;
-  max-height: 100%;
 }
 .overlay{
   position: fixed;

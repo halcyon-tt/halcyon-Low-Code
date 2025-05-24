@@ -68,17 +68,17 @@ function SideMenu() {
           <SearchBox text={"搜索组件"}/>
           <EleSlot Info={"基础组件"}/>
           <div className='baseEleBox'>
-            <DraggableBox comName={'文本'} imgUrl={img1} id={'text'}/>
-            <DraggableBox comName={'按钮'} imgUrl={img2} id={'btn'}/>
-            <DraggableBox comName={'图片'} imgUrl={img3} id={'image'}/>
-            <DraggableBox comName={'视频'} imgUrl={img4} id={'video'}/>
-            <DraggableBox comName={'链接'} imgUrl={img5} id={'link'}/>
+            <DraggableBox comName={'文本'} imgUrl={img1} id={'text'} type='text'/>
+            <DraggableBox comName={'按钮'} imgUrl={img2} id={'btn'} type='button'/>
+            <DraggableBox comName={'图片'} imgUrl={img3} id={'image'} type='image'/>
+            <DraggableBox comName={'视频'} imgUrl={img4} id={'video'} type='video' />
+            <DraggableBox comName={'链接'} imgUrl={img5} id={'link'} type='link' />
           </div>
           <EleSlot Info={"复合组件"}/>
           <div className='baseEleBox'>
-            <DraggableBox comName={'自然布局'} imgUrl={img6} id={'TexCom'}/>
-            <DraggableBox comName={'页头'} imgUrl={img7} id={'TexCom'}/>
-            <DraggableBox comName={'选项卡'} imgUrl={img8} id={'TexCom'}/>
+            <DraggableBox comName={'自然布局'} imgUrl={img6} id={'TexCom'} type='nature'/>
+            <DraggableBox comName={'页头'} imgUrl={img7} id={'TexCom'} type='header'/>
+            <DraggableBox comName={'选项卡'} imgUrl={img8} id={'TexCom'} type='chooseCard'/>
           </div>
         </div>
       </Drawer>

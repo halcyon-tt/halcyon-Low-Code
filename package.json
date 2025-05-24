@@ -13,16 +13,20 @@
     "@reduxjs/toolkit": "^2.8.2",
     "antd": "^5.25.1",
     "install": "^0.13.0",
+    "lodash": "^4.17.21",
     "npm": "^11.3.0",
     "react": "^19.1.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^19.1.0",
+    "react-merge-refs": "^3.0.2",
     "react-redux": "^9.2.0",
-    "react-router-dom": "^7.6.0"
+    "react-router-dom": "^7.6.0",
+    "redux": "^5.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
+    "@types/lodash": "^4.17.16",
     "@types/react": "^19.1.2",
     "@types/react-dnd": "^3.0.2",
     "@types/react-dom": "^19.1.2",
