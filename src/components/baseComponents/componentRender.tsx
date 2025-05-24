@@ -79,6 +79,10 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({ component }) => {
           <button
           // onMouseDown={(e) => e.stopPropagation()}
             style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              textAlign: 'center',
               width: component.style.width,
               height: component.style.height,
               backgroundColor: '#1890ff',

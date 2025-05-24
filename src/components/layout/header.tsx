@@ -1,6 +1,9 @@
 import { Button } from 'antd'
 import { useState } from 'react'
-
+// interface HeaderProps {
+//   onExport: (type: 'html' | 'react' | 'json') => Promise<void>;
+//   exportLoading: boolean;
+// }
 export default function Header (){
   const [loadings,setLoadings] = useState<boolean[]>([]);
   const enterLoading = (index:number)=>{

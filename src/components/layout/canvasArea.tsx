@@ -82,7 +82,7 @@ function CanvasArea() {
         id: item.id,
         x: clampedX,
         y: clampedY,
-        content: item.content || ''
+        content: component.content || ''
       }))
     },16,{ trailing: false }),
     [dispatch]
@@ -128,6 +128,9 @@ function CanvasArea() {
       switch(item.type) {
         case 'text':
           componentData.content = '点击编辑文本'
+          break
+        case 'button': 
+        componentData.content = '按钮'
           break
         case 'image':
           if (item.imageUrl) {

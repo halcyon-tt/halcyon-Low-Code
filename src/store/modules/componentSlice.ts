@@ -10,7 +10,21 @@ type ComponentStyle = {
   borderRadius?: string;
   border?: string;
   lineHeight?:number;
-  minHeight?:string
+  minHeight?:string;
+  minWidth?:string;
+  content?:string;
+  fontWeight?: "normal" | "bold" | "lighter"|number;
+  fontFamily?: string;
+  textIndent?: string;
+  transition?:string;
+  textDecoration?: string;
+  letterSpacing?: string;
+  lineSpacing?: string;
+  justifyContent?: "flex-start" | "center" | "flex-end";
+  alignItems?: "flex-start" | "center" | "flex-end";
+  imgWidth?: string;
+  imgHeight?: string;
+  zIndex?:number;
 }
 export interface Component{
   id:string;
@@ -39,10 +53,6 @@ const componentSlice = createSlice({
     updateComponentsPosition:(state , action:PayloadAction<{id:string;x:number;y:number;content:string}>)=>{
       const { id, x, y } = action.payload;
       const comp = state.components.find(c => c.id === id);
-      // if(comp){
-      //   comp.position = {x:action.payload.x,y:action.payload.y};
-      //   comp.content = action.payload.content
-      // }
       if (comp) {
         comp.position.x = x;
         comp.position.y = y;
@@ -55,6 +65,29 @@ const componentSlice = createSlice({
     deleteComponent: (state, action: PayloadAction<string>) => {
       state.components = state.components.filter(component => component.id !== action.payload);
     },
+    updateComponentContent:(state,action:PayloadAction<{id:string;content:string}>)=>{
+        const component = state.components.find(c=>c.id === action.payload.id);
+        if(component){
+          component.content = action.payload.content;
+        }
+    },
+    updateComponentStyle: (
+      state,
+      action: PayloadAction<{
+        id: string;
+        style: Partial<ComponentStyle>;
+      }>
+    ) => {
+      const component = state.components.find(
+        (c) => c.id === action.payload.id
+      );
+      if (component) {
+        component.style = {
+          ...component.style,
+          ...action.payload.style,
+        };
+      }
+    },
   }
 })
 export interface ComponentData {
@@ -64,6 +97,6 @@ export interface ComponentData {
   position: { x: number; y: number };
   style: ComponentStyle
 }
-export const {addComponents,updateComponentsPosition,selectComponent,deleteComponent} = componentSlice.actions
+export const {addComponents,updateComponentsPosition,selectComponent,deleteComponent,updateComponentStyle,updateComponentContent} = componentSlice.actions
 const componentReducer = componentSlice.reducer;
 export default componentReducer;
