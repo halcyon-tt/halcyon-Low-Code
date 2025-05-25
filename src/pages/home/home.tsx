@@ -5,13 +5,14 @@ import RightPanel from '../../components/layout/rightPanel'
 import store from '../../store'
 import { downloadFile } from '../../utils/fileUtils';
 import { Modal ,} from "antd"
-import { useState } from 'react'
+// import { useState } from 'react'
+import { useSelector } from 'react-redux'
 import type { ComponentData } from "../../store/modules/componentSlice"
+import type { CanvasTabType,CanvasState} from "../../store/modules/canvasSlice"
 import '../../assets/css/components/header.scss'
 import '../home/home.scss'
-type mediaType = "PC" | "Phone"
 export default function Home () {
- const [activeTab,setActiveTab] = useState<mediaType>('PC')
+  const activeTab = useSelector((state:{canvas:CanvasState})=>state.canvas.activeTab)
 
     const handleExport = async (type: 'html' | 'react' | 'json') => {
       try {
@@ -53,7 +54,7 @@ export default function Home () {
       }
     };
     // 添加工具函数
-  const generateHTML = (components: ComponentData[], activeTab: mediaType) => {
+  const generateHTML = (components: ComponentData[], activeTab: CanvasTabType) => {
     return `
   <!DOCTYPE html>
   <html>
@@ -94,7 +95,7 @@ export default function Home () {
     `;
   };
   
-  const generateReactComponent = (components: ComponentData[], activeTab: mediaType) => {
+  const generateReactComponent = (components: ComponentData[], activeTab: CanvasTabType) => {
     return `
   import React from 'react';
   

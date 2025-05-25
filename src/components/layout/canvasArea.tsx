@@ -13,13 +13,14 @@ import { useSelector } from "react-redux"
 import { useEffect,useCallback } from "react"
 import { COMPONENT_DEFAULT_STYLES } from "../../config/componentStyle";
 import { selectComponent } from "../../store/modules/componentSlice";
-import store from "../../store";
+import { type CanvasTabType ,type CanvasState, setActiveTab} from "../../store/modules/canvasSlice";
+import store from "../../store"
 // import type {ModalProps} from "antd"
  import {
   useState,
   useId,
 } from "react"
-type mediaType = "PC" | "Phone"
+
 interface DragItem {
   type: keyof typeof COMPONENT_DEFAULT_STYLES
   id?: string
@@ -36,11 +37,11 @@ function CanvasArea() {
   const selectedId = useSelector(
     (state: { components: { selectedId: string | null } }) => state.components.selectedId
   );
+  const activeTab = useSelector((state:{canvas:CanvasState})=>state.canvas.activeTab)
   // const [dynamicContent,setDynamicContent] = useState<string>('');
   const [isPromptVisible,setIsPromptVisible] = useState<boolean>(false);
   const [isRealTimeViewVisible,setIsRealTimeViewVisible] = useState<boolean>(false);
   const [isBackgroundVisible,setBackgroundVisible] = useState<boolean>(false);
-  const [activeTab,setActiveTab] = useState<mediaType>('PC')
   
   const dropRef = useRef<HTMLDivElement>(null)
   const componentsRef = useRef(components)
@@ -170,7 +171,7 @@ function CanvasArea() {
     <div className="canvas">
       <CanvasTop 
       activeTab={activeTab}
-      onTabChange={(type) => setActiveTab(type)}
+      onTabChange={(type:CanvasTabType) => dispatch(setActiveTab(type))}
       componentId={selectedId|| ''}
       />
       <div className={`center mainBtn ${activeTab === 'Phone' ? 'phoneSize' : ''}`}

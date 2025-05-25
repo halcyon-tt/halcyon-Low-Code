@@ -5,10 +5,10 @@ import "../../assets/css/baseComponents/canvasTop.scss"
 import { deleteComponent } from "../../store/modules/componentSlice"
 import { useDispatch } from "react-redux"
 import { Button } from "antd"
-type mediaType = "PC" | "Phone"
+import type { CanvasTabType } from "../../store/modules/canvasSlice"
 interface CanvasTopProps {
-  activeTab: mediaType;
-  onTabChange: (type: mediaType) => void;
+  activeTab: CanvasTabType;
+  onTabChange: (type: CanvasTabType) => void;
   componentId: string;
 }
 function CanvasTop({activeTab,onTabChange,componentId}:CanvasTopProps ){
