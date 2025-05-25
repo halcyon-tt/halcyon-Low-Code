@@ -41,6 +41,7 @@ function CanvasArea() {
   const [isRealTimeViewVisible,setIsRealTimeViewVisible] = useState<boolean>(false);
   const [isBackgroundVisible,setBackgroundVisible] = useState<boolean>(false);
   const [activeTab,setActiveTab] = useState<mediaType>('PC')
+  
   const dropRef = useRef<HTMLDivElement>(null)
   const componentsRef = useRef(components)
   const canvasRectRef = useRef<DOMRect | null>(null)
@@ -157,6 +158,12 @@ function CanvasArea() {
     }),
     
   }))
+
+
+
+
+
+
 
   drop(dropRef)
   return (
