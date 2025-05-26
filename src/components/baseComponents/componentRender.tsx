@@ -3,6 +3,7 @@ import { useDrag} from 'react-dnd';
 import { useDispatch,useSelector } from 'react-redux';
 // import { useCallback } from 'react';
 import { updateComponentsPosition,selectComponent } from '../../store/modules/componentSlice';
+import {COMPONENT_DEFAULT_STYLES} from '../../config/componentStyle';
 import type { ComponentData } from '../../store/modules/componentSlice';
 // import { throttle } from 'lodash';
 // import { useCallback,useRef } from 'react';
@@ -70,46 +71,113 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({ component }) => {
               padding: 4
             }}
           >
-            {component.content}
+            {component.content||'点击编辑文本'}
           </div>
         );
 
       case 'button':
         return (
+          // <button
+          // // onMouseDown={(e) => e.stopPropagation()}
+          //   style={{
+          //     display: 'flex',
+          //     justifyContent: 'center',
+          //     alignItems: 'center',
+          //     textAlign: 'center',
+          //     width: component.style.width,
+          //     height: component.style.height,
+          //     backgroundColor: '#1890ff',
+          //     color: 'white',
+          //     border: 'none',
+          //     borderRadius: 4,
+          //     padding: '8px 16px'
+          //   }}
+          // >
+          //   {component.content}
+          // </button>
           <button
-          // onMouseDown={(e) => e.stopPropagation()}
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              textAlign: 'center',
-              width: component.style.width,
-              height: component.style.height,
-              backgroundColor: '#1890ff',
-              color: 'white',
-              border: 'none',
-              borderRadius: 4,
-              padding: '8px 16px'
-            }}
-          >
-            {component.content}
-          </button>
+          style={{
+            // all: 'unset',
+            ...COMPONENT_DEFAULT_STYLES.button,
+            ...component.style
+          }}
+          
+        >
+          {component.content||'按钮'}
+        </button>
         );
 
       case 'image':
         return (
-          <img 
-          // onMouseDown={(e) => e.stopPropagation()}
-            src={component.content} 
-            alt="图片"
-            style={{ 
-              width: component.style.width,
-              height: component.style.height,
-              border: '1px dashed #999'
-            }}
-          />
-        );
+          <div
+          style={{
+            ...COMPONENT_DEFAULT_STYLES.image
 
+          }}
+          
+          ></div>
+          // <img 
+          // // onMouseDown={(e) => e.stopPropagation()}
+          //   // src={component.content} 
+          //   // alt="图片"
+          //   style={{ 
+          //     width: component.style.width,
+          //     height: component.style.height,
+          //     border: '1px dashed #999'
+          //   }}
+          // />
+        );
+        case 'video':
+          return(
+            <div 
+            style={{ 
+              ...COMPONENT_DEFAULT_STYLES.video, 
+              ...component.style 
+            }}
+          >
+            {/* 添加 video 元素并绑定内容 */}
+            <video 
+              controls 
+              style={{ 
+                width: '100%', 
+                height: '100%',
+                objectFit: 'cover' // 确保视频填充容器
+              }}
+            >
+              <source src={component.content} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          )
+          case 'link':
+          return( <></>)
+          case 'nature':
+          return( <div
+            style={{
+              ...COMPONENT_DEFAULT_STYLES.nature,
+              ...component.style,
+            }}
+          >
+            🌿 自然元素
+          </div>)
+          case 'chooseCard':
+          return(  <div
+            style={{
+              ...COMPONENT_DEFAULT_STYLES.chooseCard,
+              ...component.style,
+            }}
+          >
+            🃏 选择卡片
+          </div>)
+          case 'header':
+          return( <h1
+            style={{
+              ...COMPONENT_DEFAULT_STYLES.header,
+              ...component.style,
+            }}
+          >
+            {component.content || '标题'}
+          </h1>)
       default:
         return null;
     }
@@ -133,7 +201,7 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({ component }) => {
         opacity: isDragging ? 0.5 : 1,
         cursor: "move",
         outline: selectedId === component.id ? "2px solid #1890ff" : "none",
-        ...component.style
+        zIndex:10,
       }}
     >
       {renderComponent()}

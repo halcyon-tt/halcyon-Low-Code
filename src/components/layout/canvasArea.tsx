@@ -14,6 +14,7 @@ import { useEffect,useCallback } from "react"
 import { COMPONENT_DEFAULT_STYLES } from "../../config/componentStyle";
 import { selectComponent } from "../../store/modules/componentSlice";
 import { type CanvasTabType ,type CanvasState, setActiveTab} from "../../store/modules/canvasSlice";
+import DefaultImage from "../../assets/images/home/header-logo.jpg"
 import store from "../../store"
 // import type {ModalProps} from "antd"
  import {
@@ -50,6 +51,16 @@ function CanvasArea() {
   const realTimeViewId:string = useId();
   const backgroundId: string = useId();
   // const componentsRef = useRef(components);
+
+
+  const getDefaultContent = (type: string) => {
+    switch (type) {
+      case 'button': return '按钮';
+      case 'text': return '点击编辑文本';
+      case 'image': return DefaultImage; // 默认图片路径
+      default: return '';
+    }
+  };
   useEffect(() => {
     componentsRef.current = components
     if(dropRef.current)canvasRectRef.current = dropRef.current?.getBoundingClientRect()
@@ -114,32 +125,32 @@ function CanvasArea() {
       const x = clientOffset.x - canvasRect.left
       const y = clientOffset.y - canvasRect.top
 
-      // 获取组件默认配置
-      const defaultConfig = COMPONENT_DEFAULT_STYLES[item.type]
       
       // 创建新组件数据
       const componentData: ComponentData = {
         id: `${item.type}-${Date.now()}`,
         type: item.type,
-        content: item.content ||  "",
+        content: item.content || getDefaultContent(item.type),
         position: { x, y },
-        style: { ...defaultConfig }
+        style: { 
+          ...COMPONENT_DEFAULT_STYLES[item.type],
+        }
       }
       if (item.id) dispatch(selectComponent(item.id));
       // 特殊类型处理
-      switch(item.type) {
-        case 'text':
-          componentData.content = '点击编辑文本'
-          break
-        case 'button': 
-        componentData.content = '按钮'
-          break
-        case 'image':
-          if (item.imageUrl) {
-            componentData.content = item.imageUrl
-          }
-          break
-      }
+      // switch(item.type) {
+      //   case 'text':
+      //     componentData.content = '点击编辑文本'
+      //     break
+      //   case 'button': 
+      //   componentData.content = '按钮'
+      //     break
+      //   case 'image':
+      //     if (item.imageUrl) {
+      //       componentData.content = item.imageUrl
+      //     }
+      //     break
+      // }
 
       dispatch(addComponents(componentData))
     },
@@ -159,12 +170,6 @@ function CanvasArea() {
     }),
     
   }))
-
-
-
-
-
-
 
   drop(dropRef)
   return (

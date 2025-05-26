@@ -25,6 +25,9 @@ type ComponentStyle = {
   imgWidth?: string;
   imgHeight?: string;
   zIndex?:number;
+  backgroundImage?: string;
+  backgroundSize?: string;  
+  backgroundPosition?: string;
 }
 export interface Component{
   id:string;
@@ -59,11 +62,19 @@ const componentSlice = createSlice({
         comp.content = action.payload.content
       }
     },
+    importComponents: (state, action: PayloadAction<ComponentData[]>) => {
+      state.components = action.payload;
+      state.selectedId = null;
+    },
     selectComponent: (state, action: PayloadAction<string | null>) => {
       state.selectedId = action.payload;
     },
     deleteComponent: (state, action: PayloadAction<string>) => {
       state.components = state.components.filter(component => component.id !== action.payload);
+    },
+    deleteAllComponents:(state)=>{
+      state.components = [];
+      state.selectedId = null;
     },
     updateComponentContent:(state,action:PayloadAction<{id:string;content:string}>)=>{
         const component = state.components.find(c=>c.id === action.payload.id);
@@ -97,6 +108,6 @@ export interface ComponentData {
   position: { x: number; y: number };
   style: ComponentStyle
 }
-export const {addComponents,updateComponentsPosition,selectComponent,deleteComponent,updateComponentStyle,updateComponentContent} = componentSlice.actions
+export const {addComponents,updateComponentsPosition,selectComponent,deleteComponent,updateComponentStyle,updateComponentContent,deleteAllComponents,importComponents} = componentSlice.actions
 const componentReducer = componentSlice.reducer;
 export default componentReducer;

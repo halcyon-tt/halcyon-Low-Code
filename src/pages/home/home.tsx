@@ -3,7 +3,8 @@ import SideMenu from '../../components/layout/sideMenu'
 import CanvasArea from '../../components/layout/canvasArea'
 import RightPanel from '../../components/layout/rightPanel'
 import store from '../../store'
-import { downloadFile } from '../../utils/fileUtils';
+import { downloadFile,convertComponentStyles } from '../../utils/fileUtils';
+import { COMPONENT_DEFAULT_STYLES } from '../../config/componentStyle';
 import { Modal ,} from "antd"
 // import { useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -13,7 +14,15 @@ import '../../assets/css/components/header.scss'
 import '../home/home.scss'
 export default function Home () {
   const activeTab = useSelector((state:{canvas:CanvasState})=>state.canvas.activeTab)
-
+  // 导出时合并默认样式和组件自定义样式
+const getStyle = (component: ComponentData) => {
+  const defaultStyle = COMPONENT_DEFAULT_STYLES[component.type];
+  const mergedStyle = { ...defaultStyle, ...component.style };
+  // 将对象转换为 CSS 字符串
+  return Object.entries(mergedStyle)
+    .map(([key, value]) => `${key}: ${value};`)
+    .join(' ');
+};
     const handleExport = async (type: 'html' | 'react' | 'json') => {
       try {
         // 获取最新状态
@@ -70,9 +79,7 @@ export default function Home () {
       }
       ${components.map(comp => `
         #${comp.id} {
-          ${Object.entries(comp.style)
-            .map(([k, v]) => `${k}: ${v};`)
-            .join('')}
+          ${convertComponentStyles(comp.style)}
           position: absolute;
           left: ${comp.position.x}px;
           top: ${comp.position.y}px;
@@ -83,12 +90,16 @@ export default function Home () {
   <body>
     <div class="canvas-container">
       ${components.map(comp => `
-        <div id="${comp.id}">
-          ${comp.type === 'text' ? comp.content : 
-           comp.type === 'button' ? `<button>${comp.content}</button>` :
-           comp.type === 'image' ? `<img src="${comp.content}" />` : ''}
-        </div>
-      `).join('')}
+        ${ 
+      comp.type === 'text' ? 
+        `<div id="${comp.id}" style="${getStyle(comp)}">${comp.content}</div>` :
+      comp.type === 'button' ? 
+        `<button id="${comp.id}" style="${getStyle(comp)}">${comp.content}</button>` :
+      comp.type === 'image' ? 
+        `<img id="${comp.id}" src="${comp.content}" style="${getStyle(comp)}" />` :
+      ''
+    }
+  `).join('')}
     </div>
   </body>
   </html>
@@ -114,9 +125,13 @@ export default function Home () {
               position: 'absolute',
               left: ${comp.position.x},
               top: ${comp.position.y},
-              ${Object.entries(comp.style)
-                .map(([k, v]) => `${k}: '${v}',`)
-                .join('\n')}
+              ${JSON.stringify(comp.style, (key, value) => {
+            // 处理React样式中的数字值
+            if (typeof value === 'number' && [
+              'width', 'height', 'fontSize', 'borderRadius'
+            ].includes(key)) return `${value}px`;
+            return value;
+          }, 2).replace(/"([^"]+)":/g, '$1:')}
             }}
           >
             ${comp.type === 'text' ? comp.content : 
