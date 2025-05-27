@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { COMPONENT_DEFAULT_STYLES } from "../../config/componentStyle";
-type ComponentStyle = {
+export type ComponentStyle = {
   width?: string;
   height?: string;
   fontSize?: string;
@@ -39,11 +39,15 @@ export interface Component{
 interface ComponentsState{
   components:ComponentData[];
   selectedId:string | null;
+  past: ComponentsState[];    
+  future: ComponentsState[];  
 }
 
 const initialState:ComponentsState = {
   components:[],
-  selectedId:null
+  selectedId:null,
+  past:[],
+  future:[],
 }
 
 const componentSlice = createSlice({
@@ -51,9 +55,17 @@ const componentSlice = createSlice({
   initialState,
   reducers:{
     addComponents:(state,action:PayloadAction<ComponentData>)=>{
+     
+      const currentStateCopy = JSON.parse(JSON.stringify(state));
+      state.past.push(currentStateCopy);
+      state.future = [];
       state.components.push(action.payload);
     },
     updateComponentsPosition:(state , action:PayloadAction<{id:string;x:number;y:number;content:string}>)=>{
+      
+      const currentStateCopy = JSON.parse(JSON.stringify(state));
+    state.past.push(currentStateCopy);
+    state.future = [];
       const { id, x, y } = action.payload;
       const comp = state.components.find(c => c.id === id);
       if (comp) {
@@ -63,6 +75,10 @@ const componentSlice = createSlice({
       }
     },
     importComponents: (state, action: PayloadAction<ComponentData[]>) => {
+     
+      const currentStateCopy = JSON.parse(JSON.stringify(state));
+    state.past.push(currentStateCopy);
+    state.future = [];
       state.components = action.payload;
       state.selectedId = null;
     },
@@ -70,13 +86,25 @@ const componentSlice = createSlice({
       state.selectedId = action.payload;
     },
     deleteComponent: (state, action: PayloadAction<string>) => {
+     
+      const currentStateCopy = JSON.parse(JSON.stringify(state));
+    state.past.push(currentStateCopy);
+    state.future = [];
       state.components = state.components.filter(component => component.id !== action.payload);
     },
     deleteAllComponents:(state)=>{
+     
+      const currentStateCopy = JSON.parse(JSON.stringify(state));
+    state.past.push(currentStateCopy);
+    state.future = [];
       state.components = [];
       state.selectedId = null;
     },
     updateComponentContent:(state,action:PayloadAction<{id:string;content:string}>)=>{
+      
+      const currentStateCopy = JSON.parse(JSON.stringify(state));
+    state.past.push(currentStateCopy);
+    state.future = [];
         const component = state.components.find(c=>c.id === action.payload.id);
         if(component){
           component.content = action.payload.content;
@@ -89,6 +117,10 @@ const componentSlice = createSlice({
         style: Partial<ComponentStyle>;
       }>
     ) => {
+    
+      const currentStateCopy = JSON.parse(JSON.stringify(state));
+    state.past.push(currentStateCopy);
+    state.future = [];
       const component = state.components.find(
         (c) => c.id === action.payload.id
       );
@@ -99,6 +131,23 @@ const componentSlice = createSlice({
         };
       }
     },
+    undo: (state) => {
+      if (state.past.length === 0) return;
+      const previousState = state.past[state.past.length - 1];
+      state.future.push({ ...state }); 
+      state.components = previousState.components;
+      state.selectedId = previousState.selectedId;
+      state.past.pop(); 
+    },
+    // 重做
+    redo: (state) => {
+      if (state.future.length === 0) return;
+      const nextState = state.future[state.future.length - 1];
+      state.past.push({ ...state }); 
+      state.components = nextState.components;
+      state.selectedId = nextState.selectedId;
+      state.future.pop(); 
+    },
   }
 })
 export interface ComponentData {
@@ -108,6 +157,6 @@ export interface ComponentData {
   position: { x: number; y: number };
   style: ComponentStyle
 }
-export const {addComponents,updateComponentsPosition,selectComponent,deleteComponent,updateComponentStyle,updateComponentContent,deleteAllComponents,importComponents} = componentSlice.actions
+export const {addComponents,updateComponentsPosition,selectComponent,deleteComponent,updateComponentStyle,updateComponentContent,deleteAllComponents,importComponents,redo,undo} = componentSlice.actions
 const componentReducer = componentSlice.reducer;
 export default componentReducer;

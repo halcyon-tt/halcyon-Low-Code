@@ -2,7 +2,7 @@ import icon1 from "../../assets/images/pc.png"
 import icon2 from "../../assets/images/phone.png"
 import icon3 from "../../assets/images/ctrl-z.png"
 import "../../assets/css/baseComponents/canvasTop.scss"
-import { deleteComponent,deleteAllComponents,importComponents } from "../../store/modules/componentSlice"
+import { deleteComponent,deleteAllComponents,importComponents,redo,undo } from "../../store/modules/componentSlice"
 import { useDispatch } from "react-redux"
 import { Button } from "antd"
 import type { CanvasTabType } from "../../store/modules/canvasSlice"
@@ -65,8 +65,8 @@ function CanvasTop({activeTab,onTabChange,componentId}:CanvasTopProps ){
       </div>
       <div className="top-right">
         <div className="top-right-operator">
-          <img src={icon3} className="show"/>
-          <img src={icon3} className="show restore"/>
+          <img src={icon3} className="show" onClick={()=>dispatch(undo())}/>
+          <img src={icon3} className="show restore" onClick={()=>dispatch(redo())}/>
         </div>
         <div className="top-right-function">
           {/* <Button ><span>静态定位</span></Button> */}

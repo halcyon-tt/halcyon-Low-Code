@@ -3,19 +3,18 @@ import "../../assets/css/components/canvasArea.scss"
 import addbtn from "../../assets/images/add-btn.png"
 import { throttle } from "lodash";
 import type { ComponentData } from "../../store/modules/componentSlice"
-import { addComponents,updateComponentsPosition } from "../../store/modules/componentSlice"
+
 import ComponentRenderer from "../baseComponents/componentRender"
-import { useRef } from "react"
-import { useDispatch } from "react-redux"
+import { useRef,useEffect,useCallback,useMemo } from "react"
+import { useDispatch,useSelector  } from "react-redux"
 import { useDrop } from "react-dnd"
 import { Modal ,} from "antd"
-import { useSelector } from "react-redux"
-import { useEffect,useCallback } from "react"
 import { COMPONENT_DEFAULT_STYLES } from "../../config/componentStyle";
 import { selectComponent } from "../../store/modules/componentSlice";
 import { type CanvasTabType ,type CanvasState, setActiveTab} from "../../store/modules/canvasSlice";
 import DefaultImage from "../../assets/images/home/header-logo.jpg"
 import store from "../../store"
+import debounceDispatch from "../../utils/debounce";
 // import type {ModalProps} from "antd"
  import {
   useState,
@@ -31,6 +30,7 @@ interface DragItem {
 }
 function CanvasArea() {
   const dispatch = useDispatch()
+  const debouncedDispatch = useMemo(() => debounceDispatch(dispatch), [dispatch]);
   const components = useSelector(
     (state: { components: { components: ComponentData[] } }) => 
       state.components.components || []
@@ -91,12 +91,12 @@ function CanvasArea() {
       const clampedX = Math.max(0, Math.min(newX, maxX));
       const clampedY = Math.max(0, Math.min(newY, maxY));
       
-      dispatch(updateComponentsPosition({
+      debouncedDispatch.updateComponentsPosition({
         id: item.id,
         x: clampedX,
         y: clampedY,
         content: component.content || ''
-      }))
+      })
     },16,{ trailing: false }),
     [dispatch]
   )
@@ -152,7 +152,8 @@ function CanvasArea() {
       //     break
       // }
 
-      dispatch(addComponents(componentData))
+     debouncedDispatch.addComponents(componentData);
+
     },
     hover: (item: DragItem, monitor) => {
       if (!monitor.isOver({ shallow: true })) return;
