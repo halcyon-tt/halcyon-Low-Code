@@ -11,16 +11,12 @@ import type { ComponentState } from 'react';
 interface ComponentRendererProps {
   component: ComponentData;
 }
-
-const ComponentRenderer: React.FC<ComponentRendererProps> = ({ component }) => {
+interface ComponentRendererProps {
+  component: ComponentData;
+  isPreview?: boolean;
+}
+const ComponentRenderer: React.FC<ComponentRendererProps> = ({ component,isPreview = false }) => {
   const dispatch = useDispatch();
-  // const offsetRef = useRef({ x: 0, y: 0 });
-  // const ref = useRef<HTMLDivElement>(null);
-  // const throttledUpdate = useCallback(throttle((id:string, x:number, y:number) => {
-  //   dispatch(updateComponentsPosition({ id, x, y, content: component.content }));
-  // }, 16), [dispatch]);
-  // 拖拽逻辑
-  // const domRef = useRef<HTMLDivElement>(null);
   const selectedId = useSelector((state: { components: ComponentState }) => state.components.selectedId);
   const [{isDragging}, drag] = useDrag(() => ({
     type: 'COMPONENT',
@@ -37,6 +33,7 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({ component }) => {
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
+    canDrag: () => !isPreview,
       end: (item: unknown, monitor: { didDrop: () => unknown; }) => {
         if (!monitor.didDrop()) {
           // 取消无效拖拽
@@ -49,7 +46,7 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({ component }) => {
         }
       }
     
-  }));
+  }),[isPreview]);
   const renderComponent = () => {
     switch (component.type) {
       case 'text':
@@ -57,6 +54,7 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({ component }) => {
           <div
             // contentEditable
             // onMouseDown={(e) => e.stopPropagation()}
+            contentEditable={!isPreview}
             onBlur={(e) => dispatch(updateComponentsPosition({
               id: component.id,
               x: component.position.x,
@@ -185,9 +183,9 @@ const ComponentRenderer: React.FC<ComponentRendererProps> = ({ component }) => {
 
   return (
     <div
-      ref={(node)=>{
+      ref={!isPreview ?(node)=>{
         drag(node)
-      }}
+      }:null}
       onClick={(e: React.MouseEvent) => {
         e.stopPropagation();
         if (e.button === 0) { 

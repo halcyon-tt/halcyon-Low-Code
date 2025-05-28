@@ -5,6 +5,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  transform: translateZ(0); 
   // overflow-y: scroll;
 }
 .center{

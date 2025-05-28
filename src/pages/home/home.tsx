@@ -97,7 +97,20 @@ const getStyle = (component: ComponentData) => {
         `<button id="${comp.id}" style="${getStyle(comp)}">${comp.content}</button>` :
       comp.type === 'image' ? 
         `<img id="${comp.id}" src="${comp.content}" style="${getStyle(comp)}" />` :
+      comp.type === 'video' ? 
+        `<video id="${comp.id}" controls style="${getStyle(comp)}">
+          <source src="${comp.content}" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>` :
+      comp.type === 'nature' ? 
+        `<div id="${comp.id}" style="${getStyle(comp)}">🌿 自然元素</div>` :
+      comp.type === 'chooseCard' ? 
+        `<div id="${comp.id}" style="${getStyle(comp)}">🃏 选择卡片</div>` :
+      comp.type === 'header' ? 
+        `<h1 id="${comp.id}" style="${getStyle(comp)}">${comp.content || '标题'}</h1>` :
       ''
+
+      
     }
   `).join('')}
     </div>
@@ -136,7 +149,14 @@ const getStyle = (component: ComponentData) => {
           >
             ${comp.type === 'text' ? comp.content : 
              comp.type === 'button' ? `<button>${comp.content}</button>` :
-             comp.type === 'image' ? `<img src="${comp.content}" alt="image" />` : ''}
+             comp.type === 'image' ? `<img src="${comp.content}" alt="image" />`              :
+              comp.type === 'video' ? `<video controls>
+                  <source src="${comp.content}" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>`:
+              comp.type === 'nature' ? '🌿 自然元素' :
+              comp.type === 'chooseCard' ? '🃏 选择卡片' :
+              comp.type === 'header' ? `<h1>${comp.content || '标题'}</h1>`: ''}
           </div>
         `).join('')}
       </div>

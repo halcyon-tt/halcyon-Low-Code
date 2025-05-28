@@ -3,7 +3,7 @@ import "../../assets/css/components/canvasArea.scss"
 import addbtn from "../../assets/images/add-btn.png"
 import { throttle } from "lodash";
 import type { ComponentData } from "../../store/modules/componentSlice"
-
+import { Button } from "antd/lib";
 import ComponentRenderer from "../baseComponents/componentRender"
 import { useRef,useEffect,useCallback,useMemo } from "react"
 import { useDispatch,useSelector  } from "react-redux"
@@ -15,6 +15,7 @@ import { type CanvasTabType ,type CanvasState, setActiveTab} from "../../store/m
 import DefaultImage from "../../assets/images/home/header-logo.jpg"
 import store from "../../store"
 import debounceDispatch from "../../utils/debounce";
+import "../../assets/css/baseComponents/canvasTop.scss"
 // import type {ModalProps} from "antd"
  import {
   useState,
@@ -28,6 +29,40 @@ interface DragItem {
   content?: string
   imageUrl?: string
 }
+interface PreviewContentProps {
+  components: ComponentData[];
+  activeTab: CanvasTabType;
+  isPreview?: boolean;
+}
+const PreviewContent = ({ components, activeTab, isPreview = true }: PreviewContentProps) => {
+  return (
+    <div className={`preview-container ${activeTab.toLowerCase()}`}>
+      <div className="preview-content">
+        {components.map((component) => (
+          <ComponentRenderer 
+            key={component.id}
+            component={component}
+            isPreview={isPreview}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+const getDefaultSize = (type: string): { width: number; height: number } => {
+  const style = COMPONENT_DEFAULT_STYLES[type as keyof typeof COMPONENT_DEFAULT_STYLES];
+  // 解析宽高
+  const parseValue = (value: string | number) => {
+    if (typeof value === 'number') return value;
+    if (value.endsWith('px')) return parseInt(value);
+    return 100;
+  };
+  
+  return {
+    width: parseValue(style.width),
+    height: parseValue(style.height)
+  };
+};
 function CanvasArea() {
   const dispatch = useDispatch()
   const debouncedDispatch = useMemo(() => debounceDispatch(dispatch), [dispatch]);
@@ -43,7 +78,8 @@ function CanvasArea() {
   const [isPromptVisible,setIsPromptVisible] = useState<boolean>(false);
   const [isRealTimeViewVisible,setIsRealTimeViewVisible] = useState<boolean>(false);
   const [isBackgroundVisible,setBackgroundVisible] = useState<boolean>(false);
-  
+  const [previewVisible, setPreviewVisible] = useState(false);
+
   const dropRef = useRef<HTMLDivElement>(null)
   const componentsRef = useRef(components)
   const canvasRectRef = useRef<DOMRect | null>(null)
@@ -57,7 +93,7 @@ function CanvasArea() {
     switch (type) {
       case 'button': return '按钮';
       case 'text': return '点击编辑文本';
-      case 'image': return DefaultImage; // 默认图片路径
+      case 'image': return DefaultImage;
       default: return '';
     }
   };
@@ -65,10 +101,11 @@ function CanvasArea() {
     componentsRef.current = components
     if(dropRef.current)canvasRectRef.current = dropRef.current?.getBoundingClientRect()
   }, [components])
+//组件移动处理
   const handleComponentMove = useCallback(
     throttle((item: DragItem, monitor) => {
-      if (!item.id ) return;
-      const canvasRect = dropRef.current?.getBoundingClientRect();
+      if (!item.id) return;
+      const canvasRect = canvasRectRef.current;
     if (!canvasRect) return;
     const clientOffset = monitor.getClientOffset();
     if (!clientOffset) return;
@@ -97,7 +134,7 @@ function CanvasArea() {
         y: clampedY,
         content: component.content || ''
       })
-    },16,{ trailing: false }),
+    },16,{ trailing: true, leading: false }), 
     [dispatch]
   )
   useEffect(() => {
@@ -111,7 +148,7 @@ function CanvasArea() {
     drop: (item: DragItem, monitor) => {
       handleComponentMove.flush(); 
       handleComponentMove.cancel();
-      if (item.id) return // 现有组件移动不处
+      if (item.id) return ;
       const delta = monitor.getDifferenceFromInitialOffset();
       if (!delta || (delta.x === 0 && delta.y === 0)) return;
       if (delta) {
@@ -121,37 +158,28 @@ function CanvasArea() {
       const clientOffset = monitor.getClientOffset()
       if (!clientOffset || !canvasRect) return
 
-      // 计算相对画布位置
-      const x = clientOffset.x - canvasRect.left
-      const y = clientOffset.y - canvasRect.top
+       // 使用默认尺寸计算中心点
+  const defaultSize = getDefaultSize(item.type);
+  const x = clientOffset.x - canvasRect.left - defaultSize.width / 2;
+  const y = clientOffset.y - canvasRect.top - defaultSize.height / 2;
 
+  // 边界限制
+  const maxX = canvasRect.width - defaultSize.width;
+  const maxY = canvasRect.height - defaultSize.height;
+  const clampedX = Math.max(0, Math.min(x, maxX));
+  const clampedY = Math.max(0, Math.min(y, maxY));
       
       // 创建新组件数据
       const componentData: ComponentData = {
         id: `${item.type}-${Date.now()}`,
         type: item.type,
         content: item.content || getDefaultContent(item.type),
-        position: { x, y },
+        position: { x:clampedX, y:clampedY },
         style: { 
           ...COMPONENT_DEFAULT_STYLES[item.type],
         }
       }
       if (item.id) dispatch(selectComponent(item.id));
-      // 特殊类型处理
-      // switch(item.type) {
-      //   case 'text':
-      //     componentData.content = '点击编辑文本'
-      //     break
-      //   case 'button': 
-      //   componentData.content = '按钮'
-      //     break
-      //   case 'image':
-      //     if (item.imageUrl) {
-      //       componentData.content = item.imageUrl
-      //     }
-      //     break
-      // }
-
      debouncedDispatch.addComponents(componentData);
 
     },
@@ -179,6 +207,7 @@ function CanvasArea() {
       activeTab={activeTab}
       onTabChange={(type:CanvasTabType) => dispatch(setActiveTab(type))}
       componentId={selectedId|| ''}
+      onPreview={()=>setPreviewVisible(true)}
       />
       <div className={`center mainBtn ${activeTab === 'Phone' ? 'phoneSize' : ''}`}
       ref={(node) => {
@@ -222,7 +251,73 @@ function CanvasArea() {
       
       </div>
       </div>
-      
+      <Modal
+         title="画布预览"
+        open={previewVisible}
+        onCancel={() => setPreviewVisible(false)}
+        footer={[
+        <Button key="close" onClick={() => setPreviewVisible(false)}>
+          关闭预览
+        </Button>,
+      ]}
+        width="100%"
+        style={{ 
+        top: 0, 
+        maxWidth: '100vw',
+        height: '100vh',
+        padding: 0,
+        margin: 0
+      }}
+  bodyStyle={{ 
+    padding: 0,
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f0f2f5',
+    overflow: 'auto'
+  }}
+  destroyOnClose
+>
+  <div style={{
+    maxWidth: '100%',
+    maxHeight: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: '20px',
+    boxSizing: 'border-box'
+  }}>
+    <div 
+      className={`preview-container ${activeTab.toLowerCase()}`}
+      style={{
+        position: 'relative',
+        boxShadow: '0 0 30px rgba(0,0,0,0.15)',
+        backgroundColor: 'white',
+        overflow: 'hidden',
+        ...(activeTab === 'PC' ? {
+          width: '100%',
+          maxWidth: '1200px',
+          height: '90vh',
+          borderRadius: '8px'
+        } : {
+          width: '375px',
+          height: '667px',
+          border: '12px solid #333',
+          borderTopWidth: '40px',
+          borderBottomWidth: '40px',
+          borderRadius: '36px',
+          boxShadow: '0 10px 25px rgba(0,0,0,0.3)'
+        })
+      }}
+    >
+      <PreviewContent 
+        components={components} 
+        activeTab={activeTab} 
+      />
+    </div>
+  </div>
+</Modal>
     </div>
   )
 }

@@ -10,8 +10,9 @@ interface CanvasTopProps {
   activeTab: CanvasTabType;
   onTabChange: (type: CanvasTabType) => void;
   componentId: string;
+  onPreview:()=>void;
 }
-function CanvasTop({activeTab,onTabChange,componentId}:CanvasTopProps ){
+function CanvasTop({activeTab,onTabChange,componentId,onPreview}:CanvasTopProps ){
   const dispatch = useDispatch();
   const handleImportJson = () => {
     // 1. 创建隐藏的 file input 元素
@@ -49,6 +50,14 @@ function CanvasTop({activeTab,onTabChange,componentId}:CanvasTopProps ){
     // 7. 触发文件选择
     input.click();
   };
+  const handleTabChange = (type:CanvasTabType) =>{
+    onTabChange(type);
+    dispatch(deleteAllComponents());
+    alert('切换视图会清空当前画布，请谨慎操作！');
+  }
+
+
+
 
   return (
     <div className="top">
@@ -56,17 +65,17 @@ function CanvasTop({activeTab,onTabChange,componentId}:CanvasTopProps ){
         <img className="top-left-logo"/>
       </div>
       <div className="top-center">
-        <div className={`top-center-pc ${activeTab === 'PC' ? 'active' : ''}`} onClick={()=>onTabChange('PC')}>
-          <img src={icon1}/>
+        <div className={`top-center-pc ${activeTab === 'PC' ? 'active' : ''}`} onClick={()=>handleTabChange('PC') }>
+          <img src={icon1} alt="PC视图"/>
         </div>
-        <div className={`top-center-phone ${activeTab === 'Phone' ? 'active' : ''}`} onClick={()=>onTabChange('Phone')}>
-          <img src={icon2}/>
+        <div className={`top-center-phone ${activeTab === 'Phone' ? 'active' : ''}`} onClick={()=>handleTabChange('Phone') }>
+          <img src={icon2} alt="手机视图"/>
         </div>
       </div>
       <div className="top-right">
         <div className="top-right-operator">
-          <img src={icon3} className="show" onClick={()=>dispatch(undo())}/>
-          <img src={icon3} className="show restore" onClick={()=>dispatch(redo())}/>
+          <img src={icon3} className="show" alt="撤销" onClick={()=>dispatch(undo())}/>
+          <img src={icon3} className="show restore" alt="重做" onClick={()=>dispatch(redo())}/>
         </div>
         <div className="top-right-function">
           {/* <Button ><span>静态定位</span></Button> */}
@@ -74,7 +83,7 @@ function CanvasTop({activeTab,onTabChange,componentId}:CanvasTopProps ){
           {/* <Button><span>保存</span></Button> */}
           <Button onClick={handleImportJson}><span>导入Json</span></Button>
           <Button  onClick={()=>dispatch(deleteAllComponents())}><span>重置</span></Button>
-          <Button ><span>预览</span></Button>
+          <Button onClick={onPreview}><span>预览</span></Button>
           {/* <Button ><span>发布</span></Button> */}
         </div>
       </div>

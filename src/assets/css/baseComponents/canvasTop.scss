@@ -49,6 +49,12 @@
   width: 20px;
   height: 25px;
 }
+.top-center-pc:hover{
+  cursor:pointer;
+}
+.top-center-phone:hover{
+  cursor:pointer;
+}
 .active{
   background: #f2f2f2;
 }
@@ -71,6 +77,9 @@
 .show{
   opacity: .5;
 }
+.show:hover{
+  cursor: pointer;
+}
 .restore{
   transform: rotateY(180deg);
 }
@@ -81,6 +90,34 @@
   margin-left: 15px;
   margin-right: 3px;
 }
+.preview-container {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background: #f0f2f5;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
 
+  .preview-content {
+    position: relative;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    background: white;
+    
+    &.pc {
+      width: 1200px;
+      min-height: 90vh;
+    }
+    
+    &.phone {
+      width: 375px;
+      min-height: 667px;
+      border: 12px solid #333;
+      border-radius: 36px;
+      overflow: hidden;
+    }
+  }
+}
 
 

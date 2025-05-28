@@ -49,105 +49,159 @@ const initialState:ComponentsState = {
   past:[],
   future:[],
 }
-
+const MAX_HISTORY = 10;
 const componentSlice = createSlice({
   name:'components',
   initialState,
   reducers:{
-    addComponents:(state,action:PayloadAction<ComponentData>)=>{
-     
-      const currentStateCopy = JSON.parse(JSON.stringify(state));
-      state.past.push(currentStateCopy);
+    recordHistory: (state) => {
+      if (state.past.length >= MAX_HISTORY) {
+        state.past.shift();
+      }
+      state.past.push({
+        components: state.components.map(c => ({
+          ...c,
+          position: {...c.position},
+          style: {...c.style}
+        })),
+        selectedId: state.selectedId,
+        past: [],
+        future: []
+      });
       state.future = [];
-      state.components.push(action.payload);
     },
-    updateComponentsPosition:(state , action:PayloadAction<{id:string;x:number;y:number;content:string}>)=>{
-      
-      const currentStateCopy = JSON.parse(JSON.stringify(state));
-    state.past.push(currentStateCopy);
-    state.future = [];
-      const { id, x, y } = action.payload;
-      const comp = state.components.find(c => c.id === id);
-      if (comp) {
-        comp.position.x = x;
-        comp.position.y = y;
-        comp.content = action.payload.content
+    addComponents: {
+      reducer(state, action: PayloadAction<ComponentData>) {
+        state.components.push(action.payload);
+        componentSlice.caseReducers.recordHistory(state);
+      },
+      prepare(component: ComponentData) {
+        return { payload: component };
       }
     },
-    importComponents: (state, action: PayloadAction<ComponentData[]>) => {
-     
-      const currentStateCopy = JSON.parse(JSON.stringify(state));
-    state.past.push(currentStateCopy);
-    state.future = [];
-      state.components = action.payload;
-      state.selectedId = null;
+
+    updateComponentsPosition: {
+      reducer(state, action: PayloadAction<{id: string; x: number; y: number; content: string}>) {
+        const { id, x, y } = action.payload;
+        const comp = state.components.find(c => c.id === id);
+        if (comp) {
+          comp.position.x = x;
+          comp.position.y = y;
+          comp.content = action.payload.content;
+        }
+        componentSlice.caseReducers.recordHistory(state);
+      },
+      prepare(payload: {id: string; x: number; y: number; content: string}) {
+        return { payload };
+      }
     },
+    importComponents: {
+      reducer(state, action: PayloadAction<ComponentData[]>) {
+        state.components = action.payload;
+        state.selectedId = null;
+        componentSlice.caseReducers.recordHistory(state);
+      },
+      prepare(payload: ComponentData[]) {
+        return { payload };
+      }
+    },
+
     selectComponent: (state, action: PayloadAction<string | null>) => {
       state.selectedId = action.payload;
     },
-    deleteComponent: (state, action: PayloadAction<string>) => {
-     
-      const currentStateCopy = JSON.parse(JSON.stringify(state));
-    state.past.push(currentStateCopy);
-    state.future = [];
-      state.components = state.components.filter(component => component.id !== action.payload);
+    deleteComponent: {
+      reducer(state, action: PayloadAction<string>) {
+        state.components = state.components.filter(component => component.id !== action.payload);
+        componentSlice.caseReducers.recordHistory(state); 
+      },
+      prepare(payload: string) {
+        return { payload };
+      }
     },
-    deleteAllComponents:(state)=>{
-     
-      const currentStateCopy = JSON.parse(JSON.stringify(state));
-    state.past.push(currentStateCopy);
-    state.future = [];
-      state.components = [];
-      state.selectedId = null;
+    deleteAllComponents: {
+      reducer(state) {
+        state.components = [];
+        state.selectedId = null;
+        componentSlice.caseReducers.recordHistory(state);
+      },
+      prepare() {
+        return { payload: null };
+      }
     },
-    updateComponentContent:(state,action:PayloadAction<{id:string;content:string}>)=>{
-      
-      const currentStateCopy = JSON.parse(JSON.stringify(state));
-    state.past.push(currentStateCopy);
-    state.future = [];
-        const component = state.components.find(c=>c.id === action.payload.id);
-        if(component){
+    updateComponentContent: {
+      reducer(state, action: PayloadAction<{id: string; content: string}>) {
+        const component = state.components.find(c => c.id === action.payload.id);
+        if (component) {
           component.content = action.payload.content;
         }
+        componentSlice.caseReducers.recordHistory(state); 
+      },
+      prepare(payload: {id: string; content: string}) {
+        return { payload };
+      }
     },
-    updateComponentStyle: (
-      state,
-      action: PayloadAction<{
-        id: string;
-        style: Partial<ComponentStyle>;
-      }>
-    ) => {
-    
-      const currentStateCopy = JSON.parse(JSON.stringify(state));
-    state.past.push(currentStateCopy);
-    state.future = [];
-      const component = state.components.find(
-        (c) => c.id === action.payload.id
-      );
-      if (component) {
-        component.style = {
-          ...component.style,
-          ...action.payload.style,
-        };
+    updateComponentStyle: {
+      reducer(
+        state,
+        action: PayloadAction<{
+          id: string;
+          style: Partial<ComponentStyle>;
+        }>
+      ) {
+        const component = state.components.find(c => c.id === action.payload.id);
+        if (component) {
+          component.style = {
+            ...component.style,
+            ...action.payload.style,
+          };
+        }
+        componentSlice.caseReducers.recordHistory(state); 
+      },
+      prepare(payload: { id: string; style: Partial<ComponentStyle> }) {
+        return { payload };
       }
     },
     undo: (state) => {
       if (state.past.length === 0) return;
+
+      // 深拷贝当前状态存入future
+      const currentState = {
+        components: state.components.map(c => ({...c})),
+        selectedId: state.selectedId,
+        past:[],
+        future:[],
+      };
+
+      // 获取历史状态
       const previousState = state.past[state.past.length - 1];
-      state.future.push({ ...state }); 
-      state.components = previousState.components;
-      state.selectedId = previousState.selectedId;
-      state.past.pop(); 
+
+      return { 
+        components: previousState.components.map(c => ({...c})),
+        selectedId: previousState.selectedId,
+        past: state.past.slice(0, -1),
+        future: [currentState, ...state.future]
+      };
     },
-    // 重做
     redo: (state) => {
       if (state.future.length === 0) return;
-      const nextState = state.future[state.future.length - 1];
-      state.past.push({ ...state }); 
-      state.components = nextState.components;
-      state.selectedId = nextState.selectedId;
-      state.future.pop(); 
-    },
+
+      // 深拷贝当前状态存入past
+      const currentState = {
+        components: state.components.map(c => ({...c})),
+        selectedId: state.selectedId,
+        past:[],
+        future:[],
+      };
+
+      const [nextState, ...remainingFuture] = state.future;
+
+      return {
+        components: nextState.components.map(c => ({...c})),
+        selectedId: nextState.selectedId,
+        past: [...state.past, currentState],
+        future: remainingFuture
+      };
+    }
   }
 })
 export interface ComponentData {
